@@ -1,11 +1,11 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 namespace Spencen.Common.Calendar.Test
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Spencen.Common.Calendar.Services;
+
     [TestClass]
     public class CalendarTests
     {
@@ -365,6 +365,20 @@ namespace Spencen.Common.Calendar.Test
             var result = compositeCalendar.GetHolidays(dateRange);
 
             Assert.AreEqual(9 + 4 + 10, result.Count(), "9 Holidays, 4 vacation days prior to Good Friday, 10 vacation days in August.");
+        }
+
+        [TestMethod]
+        public void Get_Australian_Holidays_From_Service()
+        {
+            var dateRange = new DateRange(new DateTime(2020, 1, 1), new DateTime(2020, 12, 31));
+            var asOfDate = new DateTime(2020, 4, 10); // Good Friday
+            var service = new CalendarificService();
+            using (var context = new CalendarContext(service, dateRange))
+            {
+                var result = context.GetNextBusinessDay("au", asOfDate);
+
+                Assert.AreEqual(new DateTime(2020, 4, 14), result, "Australia observes Good Monday, so skip to 14th.");
+            }
         }
 
         #region Negative testing

@@ -1,8 +1,8 @@
-﻿namespace Spencen.Common.Calendar
+﻿namespace Spencen.Common.Calendar.Calendars
 {
     using System;
     using System.Collections.Generic;
-    using System.Text;
+    using System.Linq;
 
     public class CompositeCalendar : ICalendar
     {
@@ -29,6 +29,11 @@
                     }
                 }
             }
+        }
+
+        public bool IsWorkingDay(DayOfWeek dayOfWeek)
+        {
+            return this.childCalendars.All(c => c.IsWorkingDay(dayOfWeek));
         }
     }
 }

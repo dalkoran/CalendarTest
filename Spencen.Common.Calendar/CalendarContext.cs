@@ -2,21 +2,29 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.Linq;
 
     public class CalendarContext : IDisposable
     {
-        private IDictionary<string, ICalendar> calendars;
+        private readonly IDictionary<string, ICalendar> calendars;
+        private readonly ICalendarService service = null;
+        private readonly DateRange dateRange;
 
         public CalendarContext()
+            : this(new ICalendar[0])
         {
-            this.calendars = new Dictionary<string, ICalendar>();
         }
 
         public CalendarContext(params ICalendar[] calendars)
+            : this(null, DateRange.Infinite, calendars)
         {
+        }
+
+        public CalendarContext(ICalendarService service, DateRange dateRange, params ICalendar[] calendars)
+        {
+            this.service = service;
             this.calendars = calendars.ToDictionary(c => c.Key);
+            this.dateRange = dateRange;
         }
 
         public DateTime GetNextBusinessDay(string calendarKey, DateTime asOfDate)
@@ -78,14 +86,16 @@
 
         private ICalendar FetchCalendar(string calendarKey)
         {
-            try
+            if (this.calendars.TryGetValue(calendarKey, out ICalendar value))
             {
-                return this.calendars[calendarKey];
+                return value;
             }
-            catch (Exception ex)
+            else if (this.service != null)
             {
-                throw new ArgumentException($"The specified calendar key '{calendarKey}' does not exist within the context.", ex);
+                return this.service.GetCalendarAsync(calendarKey, this.dateRange).Result;
             }
+
+            throw new ArgumentException($"The specified calendar key '{calendarKey}' does not exist within the context.");
         }
 
         #region IDisposable Support

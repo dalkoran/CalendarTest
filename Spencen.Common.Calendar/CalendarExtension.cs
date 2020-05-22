@@ -11,9 +11,9 @@
             return calendar.Holidays.Any(h => h.Dates.Contains(date));
         }
 
-        public static bool IsWeekend(this ICalendar calendar, DateTime date)
+        public static bool IsNormalWorkingDay(this ICalendar calendar, DateTime date)
         {
-            return date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday;
+            return calendar.IsWorkingDay(date.DayOfWeek);
         }
 
         public static IEnumerable<DateTime> GetBusinessDays(this ICalendar calendar, DateRange range, Predicate<DateTime> predicate = null)
@@ -26,7 +26,7 @@
             var asOfDate = range.BeginDate.Value.Date;
             while (asOfDate < range.EndDate.Value)
             {
-                if (!calendar.IsHoliday(asOfDate) && !calendar.IsWeekend(asOfDate))
+                if (calendar.IsNormalWorkingDay(asOfDate) && !calendar.IsHoliday(asOfDate))
                 {
                     if (predicate == null || predicate(asOfDate))
                     {
@@ -45,7 +45,7 @@
             asOfDate = asOfDate.Date; // Ignore any time component
             do
             {
-                if (!calendar.IsWeekend(asOfDate) && !calendar.IsHoliday(asOfDate))
+                if (calendar.IsNormalWorkingDay(asOfDate) && !calendar.IsHoliday(asOfDate))
                 {
                     break;
                 }
@@ -62,7 +62,7 @@
             asOfDate = asOfDate.Date; // Ignore any time component
             do
             {
-                if (!calendar.IsWeekend(asOfDate) && !calendar.IsHoliday(asOfDate))
+                if (calendar.IsNormalWorkingDay(asOfDate) && !calendar.IsHoliday(asOfDate))
                 {
                     break;
                 }
@@ -82,7 +82,7 @@
             {
                 asOfDate = asOfDate.AddDays(1);
 
-                if (!calendar.IsWeekend(asOfDate) && !calendar.IsHoliday(asOfDate))
+                if (calendar.IsNormalWorkingDay(asOfDate) && !calendar.IsHoliday(asOfDate))
                 {
                     businessDayCount++;
                 }
@@ -108,7 +108,7 @@
                 foreach (var day in holiday.Dates.GetDays())
                 {
                     // Exclude weekends from holidays
-                    if (!calendar.IsWeekend(day))
+                    if (calendar.IsNormalWorkingDay(day))
                     {
                         yield return day;
                     }
@@ -152,7 +152,7 @@
             var workingDay = 0;
             while (fullWeekRange.Contains(asOfDate))
             {
-                if (!calendar.IsHoliday(asOfDate) && !calendar.IsWeekend(asOfDate))
+                if (calendar.IsNormalWorkingDay(asOfDate) && !calendar.IsHoliday(asOfDate))
                 {
                     workingDay++;
                     if (workingDay == weekDayOffset)

@@ -5,4 +5,8 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Spencen.Common.Calendar\Spencen.Common.Calendar.csproj" />
+  </ItemGroup>
+
 </Project>
