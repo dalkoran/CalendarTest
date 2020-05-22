@@ -1,0 +1,3 @@
+protocol=ssh
+host=github.com
+path=dalkoran/CalendarTest.git
