@@ -39,5 +39,15 @@
 
             yield break;
         }
+
+        public static DateRange Infinite
+        {
+            get => new DateRange();
+        }
+
+        public override string ToString()
+        {
+            return $"{(this.BeginDate.HasValue ? this.BeginDate.Value.ToString("d") : "Inception")} - {(this.EndDate.HasValue ? this.EndDate.Value.ToString("d") : "Future")}";
+        }
     }
 }
