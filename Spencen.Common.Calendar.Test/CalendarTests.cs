@@ -2,6 +2,7 @@ namespace Spencen.Common.Calendar.Test
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Spencen.Common.Calendar.Services;
@@ -42,11 +43,12 @@ namespace Spencen.Common.Calendar.Test
         [TestMethod]
         public void Returns_Today_For_Weekday()
         {
+            var asOfDate = new DateTime(2020, 5, 13); // Wednesday
             using (var calendarContext = new CalendarContext(this.calendar))
             {
-                var result = calendarContext.GetNextBusinessDay(this.calendar.Key, DateTime.Today);
+                var result = calendarContext.GetNextBusinessDay(this.calendar.Key, asOfDate);
 
-                Assert.AreEqual(DateTime.Today, result);
+                Assert.AreEqual(asOfDate, result);
             }
         }
 
@@ -73,7 +75,6 @@ namespace Spencen.Common.Calendar.Test
                 Assert.AreEqual(new DateTime(2020, 5, 26), result);
             }
         }
-
 
         [TestMethod]
         public void Returns_Easter_Monday_For_April_Break()
@@ -378,6 +379,33 @@ namespace Spencen.Common.Calendar.Test
                 var result = context.GetNextBusinessDay("au", asOfDate);
 
                 Assert.AreEqual(new DateTime(2020, 4, 14), result, "Australia observes Good Monday, so skip to 14th.");
+            }
+        }
+
+        [TestMethod]
+        public void Get_Australian_Holidays_From_Service_Many_Times_On_Multiple_Threads()
+        {
+            var dateRange = new DateRange(new DateTime(2020, 1, 1), new DateTime(2020, 12, 31));
+            var asOfDate = new DateTime(2020, 4, 10); // Good Friday
+            var service = new CalendarificService();
+            using (var context = new CalendarContext(service, dateRange))
+            {
+                // Make the first call
+                context.GetNextBusinessDay("au", asOfDate);
+
+                // Calculate the next business day for every day of the year.
+                // We expect all of these to be cached and therefore to return quickly.
+                var sw = Stopwatch.StartNew();
+                var days = Enumerable.Range(0, 364);
+                foreach (var day in days.AsParallel())
+                {
+                    var date = new DateTime(asOfDate.Year, 1, 1).AddDays(day);
+                    var result = context.GetNextBusinessDay("au", date);
+
+                    Assert.IsTrue(result.Subtract(date).TotalDays <= 4, "Australia has no more than a four day break (Easter).");
+                }
+
+                Assert.IsTrue(sw.ElapsedMilliseconds < 50, "All subsequent calls even across threads should be using cached calendar and therefore take no more than a few milliseconds.");
             }
         }
 
