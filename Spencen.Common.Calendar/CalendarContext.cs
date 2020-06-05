@@ -10,6 +10,7 @@
         {
             public const string BusinessDay = "BusinessDay";
             public const string CalendarDay = "CalendarDay";
+            private const string InternalComposite = "__Composite";
         }
 
         private readonly IDictionary<string, ICalendar> calendars;
@@ -37,36 +38,36 @@
             this.calendars[CalendarNames.CalendarDay] = CalendarFactory.Calendar;
         }
 
-        public DateTime GetNextBusinessDay(string calendarKey, DateTime asOfDate)
+        public DateTime GetCurrentOrNextBusinessDay(string calendarKey, DateTime asOfDate)
         {
-            return this.GetNextBusinessDay(this.FetchCalendar(calendarKey), asOfDate);
+            return this.GetCurrentOrNextBusinessDay(this.FetchCalendar(calendarKey), asOfDate);
         }
 
-        public DateTime GetNextBusinessDay(ICalendar calendar, DateTime asOfDate)
+        public DateTime GetCurrentOrNextBusinessDay(ICalendar calendar, DateTime asOfDate)
         {
-            return calendar.GetNextBusinessDay(asOfDate);
+            return calendar.GetCurrentOrNextBusinessDay(asOfDate);
         }
 
-        public DateTime GetNextBusinessDay(string[] calendarKeys, DateTime asOfDate)
+        public DateTime GetCurrentOrNextBusinessDay(string[] calendarKeys, DateTime asOfDate)
         {
             var calendar = CalendarFactory.MergeCalendars("__Composite", this.calendars.Values.Where(c => calendarKeys.Contains(c.Key)));
-            return calendar.GetNextBusinessDay(asOfDate);
+            return calendar.GetCurrentOrNextBusinessDay(asOfDate);
         }
 
-        public DateTime AddBusinessDay(string calendarKey, DateTime asOfDate, int numberOfDays)
+        public DateTime AddBusinessDays(string calendarKey, DateTime asOfDate, int numberOfDays)
         {
-            return this.AddBusinessDay(this.FetchCalendar(calendarKey), asOfDate, numberOfDays);
+            return this.AddBusinessDays(this.FetchCalendar(calendarKey), asOfDate, numberOfDays);
         }
 
-        public DateTime AddBusinessDay(ICalendar calendar, DateTime asOfDate, int numberOfDays)
+        public DateTime AddBusinessDays(ICalendar calendar, DateTime asOfDate, int numberOfDays)
         {
-            return calendar.AddBusinessDay(asOfDate, numberOfDays);
+            return calendar.AddBusinessDays(asOfDate, numberOfDays);
         }
 
-        public DateTime AddBusinessDay(string[] calendarKeys, DateTime asOfDate, int numberOfDays)
+        public DateTime AddBusinessDays(string[] calendarKeys, DateTime asOfDate, int numberOfDays)
         {
             var calendar = CalendarFactory.MergeCalendars("__Composite", this.calendars.Values.Where(c => calendarKeys.Contains(c.Key)));
-            return this.AddBusinessDay(calendar, asOfDate, numberOfDays);
+            return this.AddBusinessDays(calendar, asOfDate, numberOfDays);
         }
 
         public IEnumerable<DateTime> GetBusinessDays(string calendarKey, DateRange range, Predicate<DateTime> predicate = null)

@@ -4,7 +4,9 @@ namespace Spencen.Common.Calendar.Test
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Moq;
     using Spencen.Common.Calendar.Services;
 
     [TestClass]
@@ -46,7 +48,7 @@ namespace Spencen.Common.Calendar.Test
             var asOfDate = new DateTime(2020, 5, 13); // Wednesday
             using (var calendarContext = new CalendarContext(this.calendar))
             {
-                var result = calendarContext.GetNextBusinessDay(this.calendar.Key, asOfDate);
+                var result = calendarContext.GetCurrentOrNextBusinessDay(this.calendar.Key, asOfDate);
 
                 Assert.AreEqual(asOfDate, result);
             }
@@ -58,7 +60,7 @@ namespace Spencen.Common.Calendar.Test
             var asOfDate = new DateTime(2020, 5, 16); // Saturday
             using (var calendarContext = new CalendarContext(this.calendar))
             {
-                var result = calendarContext.GetNextBusinessDay(this.calendar.Key, asOfDate);
+                var result = calendarContext.GetCurrentOrNextBusinessDay(this.calendar.Key, asOfDate);
 
                 Assert.AreEqual(new DateTime(2020, 5, 18), result);
             }
@@ -70,7 +72,7 @@ namespace Spencen.Common.Calendar.Test
             var asOfDate = new DateTime(2020, 5, 25); // Memorial Day
             using (var calendarContext = new CalendarContext(this.calendar))
             {
-                var result = calendarContext.GetNextBusinessDay(this.calendar.Key, asOfDate);
+                var result = calendarContext.GetCurrentOrNextBusinessDay(this.calendar.Key, asOfDate);
 
                 Assert.AreEqual(new DateTime(2020, 5, 26), result);
             }
@@ -82,7 +84,7 @@ namespace Spencen.Common.Calendar.Test
             var asOfDate = new DateTime(2020, 4, 3); // Friday before week of Easter Friday (and personal vacation)
             using (var calendarContext = new CalendarContext(this.calendar, this.personalCalendar))
             {
-                var result = calendarContext.AddBusinessDay(new[] { this.calendar.Key, this.personalCalendar.Key }, asOfDate, 1);
+                var result = calendarContext.AddBusinessDays(new[] { this.calendar.Key, this.personalCalendar.Key }, asOfDate, 1);
 
                 Assert.AreEqual(new DateTime(2020, 4, 13), result, "Easter Monday after 4 day vacation and Good Friday.");
             }
@@ -94,7 +96,7 @@ namespace Spencen.Common.Calendar.Test
             var asOfDate = new DateTime(2020, 4, 4); // Saturday before week of Easter Friday (and personal vacation)
             using (var calendarContext = new CalendarContext(this.calendar, this.personalCalendar))
             {
-                var result = calendarContext.GetNextBusinessDay(new[] { this.calendar.Key, this.personalCalendar.Key }, asOfDate);
+                var result = calendarContext.GetCurrentOrNextBusinessDay(new[] { this.calendar.Key, this.personalCalendar.Key }, asOfDate);
 
                 Assert.AreEqual(new DateTime(2020, 4, 13), result, "Easter Monday after 4 day vacation and Good Friday.");
             }
@@ -106,7 +108,7 @@ namespace Spencen.Common.Calendar.Test
             var asOfDate = new DateTime(2020, 4, 4); // Saturday before week of Easter Friday (and personal vacation)
             using (var calendarContext = new CalendarContext(this.calendar, this.personalCalendar))
             {
-                var result = calendarContext.AddBusinessDay(new[] { this.calendar.Key, this.personalCalendar.Key }, asOfDate, 1);
+                var result = calendarContext.AddBusinessDays(new[] { this.calendar.Key, this.personalCalendar.Key }, asOfDate, 1);
 
                 Assert.AreEqual(new DateTime(2020, 4, 13), result, "Easter Monday after 4 day vacation and Good Friday.");
             }
@@ -118,7 +120,7 @@ namespace Spencen.Common.Calendar.Test
             var asOfDate = new DateTime(2020, 5, 18); // Monday
             using (var calendarContext = new CalendarContext(this.calendar))
             {
-                var result = calendarContext.AddBusinessDay(this.calendar, asOfDate, 1);
+                var result = calendarContext.AddBusinessDays(this.calendar, asOfDate, 1);
 
                 Assert.AreEqual(new DateTime(2020, 5, 19), result);
             }
@@ -130,7 +132,7 @@ namespace Spencen.Common.Calendar.Test
             var asOfDate = new DateTime(2020, 5, 15); // Friday
             using (var calendarContext = new CalendarContext(this.calendar))
             {
-                var result = calendarContext.AddBusinessDay(this.calendar, asOfDate, 1);
+                var result = calendarContext.AddBusinessDays(this.calendar, asOfDate, 1);
 
                 Assert.AreEqual(new DateTime(2020, 5, 18), result);
             }
@@ -142,7 +144,7 @@ namespace Spencen.Common.Calendar.Test
             var asOfDate = new DateTime(2020, 5, 22); // Friday
             using (var calendarContext = new CalendarContext(this.calendar))
             {
-                var result = calendarContext.AddBusinessDay(this.calendar, asOfDate, 1);
+                var result = calendarContext.AddBusinessDays(this.calendar, asOfDate, 1);
 
                 Assert.AreEqual(new DateTime(2020, 5, 26), result);
             }
@@ -376,7 +378,7 @@ namespace Spencen.Common.Calendar.Test
             var service = new CalendarificService();
             using (var context = new CalendarContext(service, dateRange))
             {
-                var result = context.GetNextBusinessDay("au", asOfDate);
+                var result = context.GetCurrentOrNextBusinessDay("au", asOfDate);
 
                 Assert.AreEqual(new DateTime(2020, 4, 14), result, "Australia observes Good Monday, so skip to 14th.");
             }
@@ -391,7 +393,7 @@ namespace Spencen.Common.Calendar.Test
             using (var context = new CalendarContext(service, dateRange))
             {
                 // Make the first call
-                context.GetNextBusinessDay("au", asOfDate);
+                context.GetCurrentOrNextBusinessDay("au", asOfDate);
 
                 // Calculate the next business day for every day of the year.
                 // We expect all of these to be cached and therefore to return quickly.
@@ -400,7 +402,7 @@ namespace Spencen.Common.Calendar.Test
                 foreach (var day in days.AsParallel())
                 {
                     var date = new DateTime(asOfDate.Year, 1, 1).AddDays(day);
-                    var result = context.GetNextBusinessDay("au", date);
+                    var result = context.GetCurrentOrNextBusinessDay("au", date);
 
                     Assert.IsTrue(result.Subtract(date).TotalDays <= 4, "Australia has no more than a four day break (Easter).");
                 }
@@ -415,7 +417,7 @@ namespace Spencen.Common.Calendar.Test
             var asOfDate = new DateTime(2020, 6, 4);
             using (var context = new CalendarContext())
             {
-                var result = context.AddBusinessDay(CalendarContext.CalendarNames.CalendarDay, asOfDate, 3);
+                var result = context.AddBusinessDays(CalendarContext.CalendarNames.CalendarDay, asOfDate, 3);
                 Assert.AreEqual(new DateTime(2020, 6, 7), result, "Calendar calendar counts weekends");
             }
         }
@@ -426,8 +428,73 @@ namespace Spencen.Common.Calendar.Test
             var asOfDate = new DateTime(2020, 6, 4);
             using (var context = new CalendarContext())
             {
-                var result = context.AddBusinessDay(CalendarContext.CalendarNames.BusinessDay, asOfDate, 3);
+                var result = context.AddBusinessDays(CalendarContext.CalendarNames.BusinessDay, asOfDate, 3);
                 Assert.AreEqual(new DateTime(2020, 6, 9), result, "Business day calendar skips weekends");
+            }
+        }
+
+        [TestMethod]
+        public void Get_Current_Or_Next_BusinessDay_On_Weekend()
+        {
+            var asOfDate = new DateTime(2020, 6, 6);
+            var result = this.calendar.AddBusinessDays(asOfDate, 0);
+            Assert.AreEqual(new DateTime(2020, 6, 8), result);
+        }
+
+        [TestMethod]
+        public void Get_Next_BusinessDay_On_Weekend()
+        {
+            var asOfDate = new DateTime(2020, 6, 6);
+            var result = this.calendar.AddBusinessDays(asOfDate, 1);
+            Assert.AreEqual(new DateTime(2020, 6, 8), result);
+        }
+
+        [TestMethod]
+        public void Get_Current_Or_Previous_BusinessDay_On_Weekend()
+        {
+            var asOfDate = new DateTime(2020, 6, 6);
+            var result = this.calendar.GetCurrentOrPriorBusinessDay(asOfDate);
+            Assert.AreEqual(new DateTime(2020, 6, 5), result);
+        }
+
+        [TestMethod]
+        public void Get_Current_Or_Previous_BusinessDay_On_Monday()
+        {
+            var asOfDate = new DateTime(2020, 6, 8);
+            var result = this.calendar.GetCurrentOrPriorBusinessDay(asOfDate);
+            Assert.AreEqual(new DateTime(2020, 6, 8), result);
+        }
+
+        [TestMethod]
+        public void Get_Previous_BusinessDay_On_Monday()
+        {
+            var asOfDate = new DateTime(2020, 6, 8);
+            var result = this.calendar.AddBusinessDays(asOfDate, -1);
+            Assert.AreEqual(new DateTime(2020, 6, 5), result);
+        }
+
+        [TestMethod]
+        public void Get_Three_BusinessDay_Prior_On_Monday()
+        {
+            var asOfDate = new DateTime(2020, 6, 8);
+            var result = this.calendar.AddBusinessDays(asOfDate, -3);
+            Assert.AreEqual(new DateTime(2020, 6, 3), result);
+        }
+
+        [TestMethod]
+        public void Service_Test()
+        {
+            var dateRange = new DateRange(new DateTime(2020, 1, 1), new DateTime(2020, 3, 31));
+
+            var mockService = new Mock<ICalendarService>();
+            mockService
+                .Setup(cs => cs.GetCalendarAsync(It.IsAny<string>(), dateRange))
+                .Returns<string, DateRange>((s, dr) => Task.FromResult(this.calendar));
+
+            using (var context = new CalendarContext(mockService.Object, dateRange))
+            {
+                var result = context.AddBusinessDays("KEY", new DateTime(2020, 6, 4), 2);
+                Assert.AreEqual(new DateTime(2020, 6, 8), result);
             }
         }
 
@@ -456,7 +523,7 @@ namespace Spencen.Common.Calendar.Test
         {
             using (var calendarContext = new CalendarContext(this.calendar, this.personalCalendar))
             {
-                calendarContext.AddBusinessDay("WRONG", DateTime.Today, 1);
+                calendarContext.AddBusinessDays("WRONG", DateTime.Today, 1);
             }
         }
 
