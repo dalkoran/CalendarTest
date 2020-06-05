@@ -6,6 +6,12 @@
 
     public class CalendarContext : IDisposable
     {
+        public static class CalendarNames
+        {
+            public const string BusinessDay = "BusinessDay";
+            public const string CalendarDay = "CalendarDay";
+        }
+
         private readonly IDictionary<string, ICalendar> calendars;
         private readonly ICalendarService service = null;
         private readonly DateRange dateRange;
@@ -25,6 +31,10 @@
             this.service = service;
             this.calendars = calendars.ToDictionary(c => c.Key);
             this.dateRange = dateRange;
+
+            // Add the two hard coded calendars
+            this.calendars[CalendarNames.BusinessDay] = CalendarFactory.BusinessCalendar;
+            this.calendars[CalendarNames.CalendarDay] = CalendarFactory.Calendar;
         }
 
         public DateTime GetNextBusinessDay(string calendarKey, DateTime asOfDate)

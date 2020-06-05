@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Runtime.CompilerServices;
     using Spencen.Common.Calendar.Calendars;
 
     public static class CalendarFactory
@@ -40,6 +39,16 @@
         public static Func<DayOfWeek, bool> SevenDayWorkWeek
         {
             get => _ => true;
+        }
+
+        public static ICalendar BusinessCalendar
+        {
+            get => new SimpleCalendar(CalendarContext.CalendarNames.BusinessDay, Enumerable.Empty<IHoliday>(), MondayToFridayWorkWeek);
+        }
+
+        public static ICalendar Calendar
+        {
+            get => new SimpleCalendar(CalendarContext.CalendarNames.CalendarDay, Enumerable.Empty<IHoliday>(), SevenDayWorkWeek);
         }
     }
 }

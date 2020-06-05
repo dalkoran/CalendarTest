@@ -409,6 +409,28 @@ namespace Spencen.Common.Calendar.Test
             }
         }
 
+        [TestMethod]
+        public void Count_Three_Calendar_Days()
+        {
+            var asOfDate = new DateTime(2020, 6, 4);
+            using (var context = new CalendarContext())
+            {
+                var result = context.AddBusinessDay(CalendarContext.CalendarNames.CalendarDay, asOfDate, 3);
+                Assert.AreEqual(new DateTime(2020, 6, 7), result, "Calendar calendar counts weekends");
+            }
+        }
+
+        [TestMethod]
+        public void Count_Three_Business_Days()
+        {
+            var asOfDate = new DateTime(2020, 6, 4);
+            using (var context = new CalendarContext())
+            {
+                var result = context.AddBusinessDay(CalendarContext.CalendarNames.BusinessDay, asOfDate, 3);
+                Assert.AreEqual(new DateTime(2020, 6, 9), result, "Business day calendar skips weekends");
+            }
+        }
+
         #region Negative testing
 
         [DataTestMethod]
