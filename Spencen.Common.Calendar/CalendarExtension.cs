@@ -40,7 +40,7 @@
             yield break;
         }
 
-        public static DateTime GetNextBusinessDay(this ICalendar calendar, DateTime asOfDate)
+        public static DateTime GetCurrentOrNextBusinessDay(this ICalendar calendar, DateTime asOfDate)
         {
             asOfDate = asOfDate.Date; // Ignore any time component
             do
@@ -57,7 +57,7 @@
             return asOfDate;
         }
 
-        public static DateTime GetPriorBusinessDay(this ICalendar calendar, DateTime asOfDate)
+        public static DateTime GetCurrentOrPriorBusinessDay(this ICalendar calendar, DateTime asOfDate)
         {
             asOfDate = asOfDate.Date; // Ignore any time component
             do
@@ -74,13 +74,25 @@
             return asOfDate;
         }
 
-        public static DateTime AddBusinessDay(this ICalendar calendar, DateTime asOfDate, int numberOfDays)
+        public static DateTime AddBusinessDays(this ICalendar calendar, DateTime asOfDate, int numberOfDays)
         {
-            var nextBusinessDay = GetPriorBusinessDay(calendar, asOfDate); // Start from prior business day (today inclusive)
+            // If we need the next business day forwards, then start from the last business day (this handles 0)
+            var offset = 1;
+            if (numberOfDays > 0)
+            {
+                asOfDate = GetCurrentOrPriorBusinessDay(calendar, asOfDate); // Start from prior business day (today inclusive)
+            }
+            else
+            {
+                asOfDate = GetCurrentOrNextBusinessDay(calendar, asOfDate); // Start from current or next business day
+                offset = -1;
+                numberOfDays = Math.Abs(numberOfDays);
+            }
+
             var businessDayCount = 0;
             while (asOfDate < DateTime.MaxValue && businessDayCount < numberOfDays)
             {
-                asOfDate = asOfDate.AddDays(1);
+                asOfDate = asOfDate.AddDays(offset);
 
                 if (calendar.IsNormalWorkingDay(asOfDate) && !calendar.IsHoliday(asOfDate))
                 {
