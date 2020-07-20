@@ -69,7 +69,7 @@
 
                 // Skip holidays and weekends
                 asOfDate = asOfDate.AddDays(-1);
-            } while (asOfDate < DateTime.MinValue);
+            } while (asOfDate > DateTime.MinValue);
 
             return asOfDate;
         }
