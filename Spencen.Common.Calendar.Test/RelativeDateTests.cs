@@ -174,7 +174,7 @@
         {
             var now = new DateTime(2020, 07, 19);
             var result = now.RelativeDate("<4e");
-            var expected = new DateTime(2020, 7, 5);
+            var expected = new DateTime(2020, 7, 11);
             Assert.AreEqual(expected, result);
         }
 
