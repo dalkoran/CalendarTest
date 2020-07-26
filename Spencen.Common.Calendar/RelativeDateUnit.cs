@@ -2,9 +2,9 @@
 {
     using System;
 
-    internal class RelativeDateUnit
+    public class RelativeDateUnit
     {
-        public RelativeDateUnit(
+        internal RelativeDateUnit(
             string key,
             string description,
             Func<int, string> descriptionBuilder,
@@ -24,10 +24,10 @@
 
         public string Key { get; }
         public string Description { get; }
-        public Func<int, string> DescriptionBuilder { get; }
-        public Func<DateTime, DateTime> Start { get; }
-        public Func<DateTime, int, DateTime> Add { get; }
-        public Func<DateTime, int, DateTime> Move { get; }
-        public Func<DateTime, bool> IsMatch { get; }
+        internal Func<int, string> DescriptionBuilder { get; }
+        internal Func<DateTime, DateTime> Start { get; }
+        internal Func<DateTime, int, DateTime> Add { get; }
+        internal Func<DateTime, int, DateTime> Move { get; }
+        internal Func<DateTime, bool> IsMatch { get; }
     }
 }

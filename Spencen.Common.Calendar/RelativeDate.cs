@@ -5,6 +5,8 @@
     using System.Diagnostics;
     using System.Globalization;
     using System.Linq;
+    using System.Runtime.CompilerServices;
+    using System.Text;
     using System.Text.RegularExpressions;
 
     /// <summary>
@@ -15,7 +17,7 @@
         private static ICalendar weekdayCalendar = CalendarFactory.CreateFromDateRanges("temp", Enumerable.Empty<DateRange>(), CalendarFactory.MondayToFridayWorkWeek);
         private static ICalendar weekendCalendar = CalendarFactory.CreateFromDateRanges("temp", Enumerable.Empty<DateRange>(), (DayOfWeek dow) => dow == DayOfWeek.Saturday || dow == DayOfWeek.Sunday);
 
-        private static IDictionary<string, RelativeDateUnit> Units { get; }
+        internal static IDictionary<string, RelativeDateUnit> Units { get; }
 
         private static IEnumerable<RelativeDateUnit> DynamicUnits = new[]
         {
@@ -63,15 +65,15 @@
                 (asOf) => weekendCalendar.IsNormalWorkingDay(asOf)),
         };
 
-        private static IEnumerable<RelativeDateAction> relativeDateActions = new[]
+        internal static IEnumerable<RelativeDateAction> RelativeDateActions = new[]
         {
-            new RelativeDateAction("@", "Move to {u}", (unit, asOf, number) => unit.Move(asOf, number)),
-            new RelativeDateAction("+", "Add {n} {PU}", (unit, asOf, number) => unit.Add(asOf, number)),
-            new RelativeDateAction("-", "Subtract {n} {PU}", (unit, asOf, number) => unit.Add(asOf, -number)),
-            new RelativeDateAction(">", "Current or next {pu}", (unit, asOf, number) => CurrentOrNext(unit, asOf, number)),
-            new RelativeDateAction("<", "Current or previous {pu}", (unit, asOf, number) => CurrentOrPrevious(unit, asOf, number)),
-            new RelativeDateAction("^", "Start of {U}", (RelativeDateUnit unit, DateTime asOf, int number) => unit.Start(asOf)),
-            new RelativeDateAction("?", "If {u} then {true} else {false}", (unit, asOf, group) => IfExpression(unit, asOf, group)),
+            new RelativeDateAction(ActionKeys.MoveTo, "Move to {u}", (unit, asOf, number) => unit.Move(asOf, number)),
+            new RelativeDateAction(ActionKeys.Add, "Add {n} {PU}", (unit, asOf, number) => unit.Add(asOf, number)),
+            new RelativeDateAction(ActionKeys.Subtract, "Subtract {n} {PU}", (unit, asOf, number) => unit.Add(asOf, -number)),
+            new RelativeDateAction(ActionKeys.MoveToNext, "Current or next {pu}", (unit, asOf, number) => CurrentOrNext(unit, asOf, number)),
+            new RelativeDateAction(ActionKeys.MoveToPrevious, "Current or previous {pu}", (unit, asOf, number) => CurrentOrPrevious(unit, asOf, number)),
+            new RelativeDateAction(ActionKeys.Start, "Start of {U}", (RelativeDateUnit unit, DateTime asOf, int number) => unit.Start(asOf)),
+            new RelativeDateAction(ActionKeys.If, "If {u} then {true} else {false}", (unit, asOf, group) => IfExpression(unit, asOf, group)),
         };
 
         private static Regex Parser;
@@ -86,7 +88,7 @@
                         n => NumberString(n) + " " + dow.ToString(),
                         (asOf) => asOf.AddDays(-(int)dow).Date,
                         (asOf, number) => asOf.NextDayOfWeek(dow, number),
-                        (asOf, number) => new DateTime(asOf.Year, asOf.Month, 1).NextDayOfWeek(dow, number),
+                        (asOf, number) => new DateTime(asOf.Year, asOf.Month, 1, asOf.Hour, asOf.Minute, asOf.Second, asOf.Millisecond).NextDayOfWeek(dow, number),
                         (asOf) => asOf.DayOfWeek == dow));
 
             var lastDayOfWeekUnits =
@@ -97,7 +99,8 @@
                         n => NumberString(n) + " last " + dow.ToString(),
                         (asOf) => asOf.AddDays(-(int)dow).Date,
                         (asOf, number) => asOf.NextDayOfWeek(dow, number),
-                        (asOf, number) => asOf.AddMonths(1).FirstDayOfMonth().Date.PreviousDayOfWeek(dow, number)));
+                        (asOf, number) => asOf.AddMonths(1).FirstDayOfMonth().PreviousDayOfWeek(dow, number),
+                        (asOf) => asOf.DayOfWeek == dow));
 
             var monthUnits = 
                 Enumerable.Range(1, 12).Select(mon =>
@@ -117,7 +120,7 @@
                 .ToDictionary(ru => ru.Key);
 
             // Construct regex
-            string actions = string.Join("|", relativeDateActions.Select(rdt => "\\" + rdt.Key)); // "@|\\+|\\-|>|<|^|\\?";
+            string actions = string.Join("|", RelativeDateActions.Select(rdt => "\\" + rdt.Key)); // "@|\\+|\\-|>|<|^|\\?";
             string units = string.Join("|", Units.Keys);
 
             Parser = new Regex($"(?<action>[{actions}])(?<number>[0-9]+)?(?<unit>({units}))(\\{{(?<true>.*?)\\}})?(\\{{(?<false>.*?)?\\}})?", RegexOptions.Compiled);
@@ -126,48 +129,80 @@
         public RelativeDate(string relativeDateExpression)
         {
             this.Expression = relativeDateExpression;
+            this.Operations = CreateOperations(this.Expression);
+            this.Description = this.BuildDescription();
+        }
+
+        internal RelativeDate(IEnumerable<RelativeDateOperation> operations)
+        {
+            this.Operations = new List<RelativeDateOperation>(operations);
+            this.Description = this.BuildDescription();
         }
 
         public string Expression { get; }
 
+        public string Description { get; }
+
+        internal List<RelativeDateOperation> Operations { get; }
+
         public DateTime Apply(DateTime asOf)
         {
-            var matches = Parser.Matches(this.Expression);
+            foreach (var operation in this.Operations)
+            {
+                var context = new RelativeDateContext(null, null, operation.Number, asOf);
+                asOf = operation.Action(context);
+            }
+
+            return asOf;
+        }
+
+        private static List<RelativeDateOperation> CreateOperations(string expression)
+        {
+            var matches = Parser.Matches(expression);
+            var operations = new List<RelativeDateOperation>();
 
             foreach (Match match in matches)
             {
                 var number = match.Groups["number"].Success ? int.Parse(match.Groups["number"].Value) : 1;
-                var action = match.Groups["action"].Value;
-                var unit = match.Groups["unit"].Value;
+                var actionKey = match.Groups["action"].Value;
+                var unitKey = match.Groups["unit"].Value;
 
-                if (!Units.TryGetValue(unit, out RelativeDateUnit unitMatch))
+                if (!Units.TryGetValue(unitKey, out RelativeDateUnit unit))
                 {
-                    throw new InvalidOperationException($"The unit '{unit}' is not supported in the expression {this.Expression}.");
+                    throw new InvalidOperationException($"The unit '{unitKey}' is not supported in the expression {expression}.");
                 }
                 else
                 {
-                    var relativeDateAction = relativeDateActions.FirstOrDefault(rdt => rdt.Key == action);
-                    if (relativeDateAction == null)
+                    var action = RelativeDateActions.FirstOrDefault(rdt => rdt.Key == actionKey);
+                    if (action == null)
                     {
-                        throw new InvalidOperationException($"The action '{action}' is not supported in the expression {this.Expression}.");
+                        throw new InvalidOperationException($"The action '{actionKey}' is not supported in the expression {expression}.");
                     }
                     else
                     {
-                        Debug.Write(BuildDescription(relativeDateAction, unitMatch, match) + " ");
-
-                        if (relativeDateAction.ActionFunc == null)
+                        if (action.ActionGroupFunc == null)
                         {
-                            asOf = relativeDateAction.ActionGroupFunc(unitMatch, asOf, match);
+                            var operation = new RelativeDateOperation(
+                                action.Description,
+                                context => action.ActionFunc(unit, context.AsOf, context.Number),
+                                unit,
+                                number);
+                            operations.Add(operation);
                         }
                         else
                         {
-                            asOf = relativeDateAction.ActionFunc(unitMatch, asOf, number);
+                            var operation = new RelativeDateOperation(
+                                action.Description,
+                                context => action.ActionGroupFunc(unit, context.AsOf, match),
+                                unit,
+                                number);
+                            operations.Add(operation);
                         }
                     }
                 }
             }
-
-            return asOf;
+            
+            return operations;
         }
 
         private static string BuildDescription(RelativeDateAction action, RelativeDateUnit unit, Match match)
@@ -184,6 +219,23 @@
                 .Replace("{n}", number.ToString())
                 .Replace("{true}", trueExpression)
                 .Replace("{false}", falseExpression);
+        }
+
+        private static string BuildDescription(RelativeDateOperation operation)
+        {
+            var unit = operation.Unit;
+            var number = operation.Number; ////match.Groups["number"].Success ? int.Parse(match.Groups["number"].Value) : 1;
+            ////var trueExpression = match.Groups["true"].Success ? match.Groups["true"].Value : null;
+            ////var falseExpression = match.Groups["false"].Success ? match.Groups["false"].Value : null;
+
+            return operation.Description
+                .Replace("{U}", unit?.Description)
+                .Replace("{PU}", number == 1 ? unit?.Description : unit?.Description + "s")
+                .Replace("{u}", unit?.DescriptionBuilder(number))
+                .Replace("{pu}", number == 1 ? unit?.DescriptionBuilder(number) : unit?.DescriptionBuilder(number) + "s")
+                .Replace("{n}", number.ToString());
+                ////.Replace("{true}", trueExpression)
+                ////.Replace("{false}", falseExpression);
         }
 
         private static string NumberString(int number, bool ignoreOne = false)
@@ -235,6 +287,29 @@
             }
 
             return asOf;
+        }
+
+        private string BuildDescription()
+        {
+            var stringBuilder = new StringBuilder();
+            foreach (var operation in this.Operations)
+            {
+                stringBuilder.Append(BuildDescription(operation));
+                stringBuilder.Append(" ");
+            }
+
+            return stringBuilder.ToString().Trim();
+        }
+
+        public static class ActionKeys
+        {
+            public const string Start = "^";
+            public const string Add = "+";
+            public const string Subtract = "-";
+            public const string MoveTo = "@";
+            public const string MoveToNext = ">";
+            public const string MoveToPrevious = "<";
+            public const string If = "?";
         }
     }
 }
