@@ -31,6 +31,9 @@ steps:
       $assemblyVersion = $xml.Project.PropertyGroup.AssemblyVersion
       $fileVersion = $xml.Project.PropertyGroup.FileVersion
       
+      echo "Assembly version: $assemblyVersion"
+      echo "File version: $fileVersion"
+
       #Split the Version Numbers
       $avMajor, $avMinor, $avBuild  = $assemblyVersion.Split(".")
       $fvMajor, $fvMinor, $fvBuild = $fileVersion.Split(".")
