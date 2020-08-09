@@ -25,7 +25,7 @@ steps:
   inputs:
     command: 'pack'
     packagesToPack: '**/Spencen.Common.Calendar.csproj'
-    versioningScheme: 'byBuildNumber'
+    versioningScheme: 'off'
     includeSymbols: true
 
 - task: NuGetCommand@2
