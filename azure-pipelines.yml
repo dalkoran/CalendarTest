@@ -28,6 +28,8 @@ steps:
     versioningScheme: 'off'
     includeSymbols: true
 
+- task: NuGetAuthenticate@0
+
 - task: NuGetCommand@2
   inputs:
     command: 'push'
