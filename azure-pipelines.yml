@@ -32,15 +32,14 @@ steps:
       echo $xml
       
       #Retrieve Version Nodes
-      $assemblyVersion = $xml.Project.PropertyGroup.AssemblyVersion
-      $fileVersion = $xml.Project.PropertyGroup.FileVersion
+      $assemblyVersion = $xml.Project.PropertyGroup.Version
       
-      echo "Assembly version: $assemblyVersion"
-      echo "File version: $fileVersion"
+      echo "Version: $assemblyVersion"
 
       #Split the Version Numbers
-      $avMajor, $avMinor, $avBuild  = $assemblyVersion.Split(".")
-      $fvMajor, $fvMinor, $fvBuild = $fileVersion.Split(".")
+      $vMajor, $vMinor, $vBuild  = $assemblyVersion.Split(".")
+      
+      echo "Version: $vMajor.$vMinor.$vBuild"
 
 - task: DotNetCoreCLI@2
   inputs:
