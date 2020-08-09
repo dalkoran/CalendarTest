@@ -39,8 +39,8 @@ steps:
       #Split the Version Numbers
       $vMajor, $vMinor, $vBuild  = $assemblyVersion.Split(".")
       
-      echo "Reconstructed Version: $vMajor.$vMinor.$vBuild.$semanticVersion"
-      $majorMinorVersion = "$vMajor.$vMinor.$vBuild"
+      echo "Reconstructed Version: $vMajor.$vMinor.$vBuild.$env:semanticVersion"
+      $env:majorMinorVersion = "$vMajor.$vMinor.$vBuild"
 
 - task: DotNetCoreCLI@2
   inputs:
