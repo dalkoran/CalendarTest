@@ -46,9 +46,17 @@ steps:
       $semanticVersion = [System.Environment]::GetEnvironmentVariable('semanticVersion', [System.EnvironmentVariableTarget]::User)
       echo "Reconstructed Version: $vMajor.$vMinor.$vBuild.$semanticVersion"
 
-      echo '##vso[task.setvariable variable=majorMinorVersion]0.2.4'
-      echo "Local: $(majorMinorVersion)"
+      echo "##vso[task.setvariable variable=majorMinorVersion]0.2.4"
+      echo "Local: $majorMinorVersion"
       echo "Env: $env:majorMinorVersion"
+      echo "VarEnv: $env:MAJORMINORVERSION"
+
+- task: PowerShell@2
+  inputs: 
+    targetType: 'inline'
+    script: |
+      echo "Var: $(majorMinorVersion)"
+      echo "VarEnv: $env:MAJORMINORVERSION"
 
 - task: DotNetCoreCLI@2
   inputs:
