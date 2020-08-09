@@ -48,7 +48,7 @@ steps:
 
       echo '##vso[task.setvariable variable=majorMinorVersion]0.2.4'
       echo "Local: $(majorMinorVersion)"
-      echo "Env: $(env:majorMinorVersion)"
+      echo "Env: $env:majorMinorVersion"
 
 - task: DotNetCoreCLI@2
   inputs:
