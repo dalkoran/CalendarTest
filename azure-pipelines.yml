@@ -35,12 +35,14 @@ steps:
       $assemblyVersion = $xml.Project.PropertyGroup.Version
       
       echo "Version: $assemblyVersion"
-
+      
       #Split the Version Numbers
       $vMajor, $vMinor, $vBuild  = $assemblyVersion.Split(".")
       
-      echo "Reconstructed Version: $vMajor.$vMinor.$vBuild.$env:semanticVersion"
+      $semanticVersion = [System.Environment].GetEnvironmentVariable('semanticVersion', [System.EnvironmentVariableTarget]::Machine)
+      echo "Reconstructed Version: $vMajor.$vMinor.$vBuild.$semanticVersion"
       $env:majorMinorVersion = "$vMajor.$vMinor.$vBuild"
+      [System.Environment]::SetEnvironmentVariable('majorMinorVersion', $env:majorMinorVersion, [System.EnvironmentVariableTarget]::Machine)
 
 - task: DotNetCoreCLI@2
   inputs:
