@@ -45,6 +45,8 @@ steps:
       $semanticVersion = [System.Environment]::GetEnvironmentVariable('semanticVersion', [System.EnvironmentVariableTarget]::User)
       echo "Reconstructed Version: $vMajor.$vMinor.$vBuild.$semanticVersion"
 
+      ##vso[task.setvariable variable=majorMinorVersion;]$majorMinorVersion
+
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
