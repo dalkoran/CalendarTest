@@ -39,7 +39,8 @@ steps:
       #Split the Version Numbers
       $vMajor, $vMinor, $vBuild  = $assemblyVersion.Split(".")
       
-      echo "Version: $vMajor.$vMinor.$vBuild"
+      echo "Reconstructed Version: $vMajor.$vMinor.$vBuild.$semanticVersion"
+      $majorMinorVersion = "$vMajor.$vMinor.$vBuild"
 
 - task: DotNetCoreCLI@2
   inputs:
@@ -67,4 +68,4 @@ steps:
     packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
     nuGetFeedType: 'internal'
     publishVstsFeed: '9081bce7-2023-4edf-b8a0-42617df8dbbf'
-    allowPackageConflicts: true
+    allowPackageConflicts: false
