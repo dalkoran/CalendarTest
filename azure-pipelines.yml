@@ -39,7 +39,7 @@ steps:
       #Split the Version Numbers
       $vMajor, $vMinor, $vBuild  = $assemblyVersion.Split(".")
       
-      $semanticVersion = [System.Environment].GetEnvironmentVariable('semanticVersion', [System.EnvironmentVariableTarget]::Machine)
+      $semanticVersion = [System.Environment]::GetEnvironmentVariable('semanticVersion', [System.EnvironmentVariableTarget]::Machine)
       echo "Reconstructed Version: $vMajor.$vMinor.$vBuild.$semanticVersion"
       $env:majorMinorVersion = "$vMajor.$vMinor.$vBuild"
       [System.Environment]::SetEnvironmentVariable('majorMinorVersion', $env:majorMinorVersion, [System.EnvironmentVariableTarget]::Machine)
