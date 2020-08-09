@@ -38,11 +38,12 @@ steps:
       
       #Split the Version Numbers
       $vMajor, $vMinor, $vBuild  = $assemblyVersion.Split(".")
-      
-      $semanticVersion = [System.Environment]::GetEnvironmentVariable('semanticVersion', [System.EnvironmentVariableTarget]::Machine)
+
+      $majorMinorVersion = "$vMajor.$vMinor.$vBuild"
+      [System.Environment]::SetEnvironmentVariable('majorMinorVersion', $majorMinorVersion, [System.EnvironmentVariableTarget]::User)
+
+      $semanticVersion = [System.Environment]::GetEnvironmentVariable('semanticVersion', [System.EnvironmentVariableTarget]::User)
       echo "Reconstructed Version: $vMajor.$vMinor.$vBuild.$semanticVersion"
-      $env:majorMinorVersion = "$vMajor.$vMinor.$vBuild"
-      [System.Environment]::SetEnvironmentVariable('majorMinorVersion', $env:majorMinorVersion, [System.EnvironmentVariableTarget]::Machine)
 
 - task: DotNetCoreCLI@2
   inputs:
