@@ -20,3 +20,17 @@ steps:
     command: 'build'
     projects: '**/*.csproj'
     arguments: '--configuration $(buildConfiguration)'
+
+- task: NuGetCommand@2
+  inputs:
+    command: 'pack'
+    packagesToPack: '**/Spencen.Common.Calendar.csproj'
+    versioningScheme: 'byBuildNumber'
+    includeSymbols: true
+
+- task: NuGetCommand@2
+  inputs:
+    command: 'push'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+    nuGetFeedType: 'internal'
+    publishVstsFeed: '9081bce7-2023-4edf-b8a0-42617df8dbbf'
