@@ -2,6 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Copyright>© 2020, Nigel Spencer</Copyright>
+    <Authors>Nigel Spencer</Authors>
+    <Company>Nigel Spencer</Company>
+    <Product />
+    <Description>Classes to perform date artithmetic, for example 5th business day in next June. Also contains RelativeDate class that allows dates to be described relative a seed date, e.g. 4th Thursday in Nov of this year.</Description>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
