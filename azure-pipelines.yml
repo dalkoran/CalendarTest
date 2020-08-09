@@ -3,6 +3,8 @@
 # Add steps that run tests, create a NuGet package, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
+name: $(majorMinorVersion).$(semanticVersion) # $(rev:r) # NOTE: rev resets when the default retention period expires
+
 trigger:
 - master
 
@@ -11,6 +13,8 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
+  majorMinorVersion: 1.0
+  semanticVersion: $[counter(variables['majorMinorVersion'], 0)]
 
 steps:
 # - script: dotnet build --configuration $(buildConfiguration)
@@ -30,7 +34,7 @@ steps:
   inputs:
     command: 'pack'
     packagesToPack: '**/Spencen.Common.Calendar.csproj'
-    versioningScheme: 'off'
+    versioningScheme: 'byBuildNumber'
     includeSymbols: true
 
 - task: NuGetAuthenticate@0
