@@ -224,9 +224,7 @@
         private static string BuildDescription(RelativeDateOperation operation)
         {
             var unit = operation.Unit;
-            var number = operation.Number; ////match.Groups["number"].Success ? int.Parse(match.Groups["number"].Value) : 1;
-            ////var trueExpression = match.Groups["true"].Success ? match.Groups["true"].Value : null;
-            ////var falseExpression = match.Groups["false"].Success ? match.Groups["false"].Value : null;
+            var number = operation.Number;
 
             return operation.Description
                 .Replace("{U}", unit?.Description)
@@ -234,8 +232,6 @@
                 .Replace("{u}", unit?.DescriptionBuilder(number))
                 .Replace("{pu}", number == 1 ? unit?.DescriptionBuilder(number) : unit?.DescriptionBuilder(number) + "s")
                 .Replace("{n}", number.ToString());
-                ////.Replace("{true}", trueExpression)
-                ////.Replace("{false}", falseExpression);
         }
 
         private static string NumberString(int number, bool ignoreOne = false)
