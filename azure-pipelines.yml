@@ -22,7 +22,9 @@ steps:
     targetType: 'inline'
     script: |
       #Get Path to csproj
-      $path = "./Spencen.Common.Calendar/Spencen.Common.Calendar.csproj"
+      $path = "$PSScriptRoot/Spencen.Common.Calendar/Spencen.Common.Calendar.csproj"
+      
+      echo $path
       
       #Read csproj (XML)
       $xml = [xml](Get-Content $path)
