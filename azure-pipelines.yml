@@ -69,13 +69,22 @@ steps:
     command: 'test'
     projects: '**/*Test.csproj'
 
-- task: NuGetCommand@2
+# - task: NuGetCommand@2
+#   inputs:
+#    command: 'pack'
+#    packagesToPack: '**/Spencen.Common.Calendar.csproj'
+#    versioningScheme: 'byEnvVar'
+#    versionEnvVar: 'semanticVersion'
+#    includeSymbols: true
+
+- task: DotNetCoreCLI@2
   inputs:
     command: 'pack'
     packagesToPack: '**/Spencen.Common.Calendar.csproj'
+    includesymbols: true
+    includesource: true
     versioningScheme: 'byEnvVar'
     versionEnvVar: 'semanticVersion'
-    includeSymbols: true
 
 - task: NuGetAuthenticate@0
 
