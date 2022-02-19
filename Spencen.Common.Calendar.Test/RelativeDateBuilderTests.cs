@@ -50,14 +50,15 @@
         [TestMethod]
         public void MoveToBeginningJulyThenFourthPriorWeekDay()
         {
-            var expected = new DateTime(DateTime.Today.Year, 6, 25);
+            var now = new DateTime(2020, 5, 5);
+            var expected = new DateTime(now.Year, 6, 25);
             var sut = new RelativeDateBuilder()
                 .MoveTo(DateTimeInterval.Month, 7)
                 .MoveToBeginningOf(DateTimeInterval.Month)
                 .Subtract(DateTimeInterval.WeekDay, 4)
                 .Create();
 
-            var result = sut.Apply(DateTime.Today);
+            var result = sut.Apply(now);
 
             Assert.AreEqual(expected, result, sut.Description);
         }
@@ -65,8 +66,8 @@
         [TestMethod]
         public void MoveToNovemberThenForwardToFourthThursday()
         {
-            var now = DateTime.Now;
-            var expected = new DateTime(DateTime.Today.Year, 11, 26, now.Hour, now.Minute, now.Second, now.Millisecond);
+            var now = new DateTime(2020, 5, 5);
+            var expected = new DateTime(now.Year, 11, 26, now.Hour, now.Minute, now.Second, now.Millisecond);
             var sut = new RelativeDateBuilder()
                 .MoveTo(DateTimeInterval.Month, 11)
                 .MoveTo(DayOfWeek.Thursday, 4)
@@ -81,8 +82,8 @@
         [TestMethod]
         public void MoveToLastFridayInNovember()
         {
-            var now = DateTime.Now;
-            var expected = new DateTime(DateTime.Today.Year, 11, 27, now.Hour, now.Minute, now.Second, now.Millisecond);
+            var now = new DateTime(2020, 5, 5);
+            var expected = new DateTime(now.Year, 11, 27, now.Hour, now.Minute, now.Second, now.Millisecond);
             var sut = new RelativeDateBuilder()
                 .MoveTo(DateTimeInterval.Month, 11)
                 .MoveToLast(DayOfWeek.Friday)
