@@ -6,7 +6,7 @@ This repository consists of the following three .NET projects.
 
 ### Main Classes
 #### RelativeDate
-Allows the description of a relative date based on the [flux syntax](https://doc.flux.ly/display/flux80/Time+Expressions#TimeExpressions-Relativetimeexpressions), examples include:
+Allows the description of a relative date based on the [flux syntax](https://docs.flux.ly/flux-8-1-docs/time-expressions.html#relative-time-expressions), examples include:
 * Seven AM today `now.RelativeDate("^d+7H")`
 * Three weekdays from now `now.RelativeDate("+3D")` (skips Sat/Sun)
 * 25 days from now `now.RelativeDate("+25d")`
