@@ -1,13 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29926.136
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33424.131
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CalendarTest", "CalendarTest\CalendarTest.csproj", "{5A7E085F-FC16-404D-BAFA-F2EECC652FD3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spencen.Common.Calendar", "Spencen.Common.Calendar\Spencen.Common.Calendar.csproj", "{449B97FC-4230-46F2-BB11-1472A34148C8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spencen.Common.Calendar.Test", "Spencen.Common.Calendar.Test\Spencen.Common.Calendar.Test.csproj", "{65D0D84C-3940-4442-B64B-7E77B5D0F004}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{0E708612-6313-426B-8DCE-310E035B5583}"
+	ProjectSection(SolutionItems) = preProject
+		ReadMe.md = ReadMe.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

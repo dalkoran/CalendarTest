@@ -95,7 +95,7 @@
         }
 
         [TestMethod]
-        public void JulyFouthHolidayMovesFromSaturdayToFriday()
+        public void JulyFourthHolidayMovesFromSundayToMonday()
         {
             var now = new DateTime(2021, 1, 1); // July fourth on a Sunday
             var expected = new DateTime(now.Year, 7, 5, now.Hour, now.Minute, now.Second, now.Millisecond);
@@ -115,7 +115,7 @@
         }
 
         [TestMethod]
-        public void JulyFourthHolidayMovesFromSundayToMonday()
+        public void JulyFouthHolidayMovesFromSaturdayToFriday()
         {
             var now = new DateTime(2020, 1, 1); // July fourth on a Saturday
             var expected = new DateTime(now.Year, 7, 3, now.Hour, now.Minute, now.Second, now.Millisecond);
