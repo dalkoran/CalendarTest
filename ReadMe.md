@@ -46,6 +46,68 @@ In order to support business days (D) as opposed to calendar days (d) we can res
 RelativeDates with a `Calendar` instance. Calendars implement a simple `ICalendar` interface
 thus allowing them to be sourced from multiple places (database, service such as Calenderific etc.).
 
+```csharp
+public interface ICalendar
+{
+    /// <summary>
+    /// Gets a key to unqiuely identify a calendar within a collection.
+    /// </summary>
+    string Key { get; }
+
+    /// <summary>
+    /// Gets the holidays specific to this calendar. Holidays do not need to include days of the week
+    /// that are non-working days, e.g. IsWorkingDay == false.
+    /// </summary>
+    IEnumerable<IHoliday> Holidays { get; }
+
+    /// <summary>
+    /// Determines whether the specified <paramref name="dayOfWeek"/> is considered to be a working
+    /// day for this calendar.
+    /// </summary>
+    /// <param name="dayOfWeek">The day of the week being checked.</param>
+    /// <returns>True if the day of the week is normally considered a working day (excluding holidays), false otherwise.</returns>
+    bool IsWorkingDay(DayOfWeek dayOfWeek);
+}
+
+public interface IHoliday
+{
+    /// <summary>
+    /// Gets the range of dates (must be specified as full days) that are considered a holiday (non-working day).
+    /// </summary>
+    DateRange Dates { get; }
+        
+    /// <summary>
+    /// Gets an optional description or the holiday, e.g. "Memorial Day".
+    /// </summary>
+    string Description { get; }
+}
+```
+
+#### CalendarFactory
+
+The `CalendarFactory` static class provides a helper method, together with two very simple functions for
+creating a default 5 or 7 day work week calendar.
+
+Here we create a calendar using the static function, which defaults to a 5 day (Mon-Fri) business days week
+and includes holidays as provided by the array.
+
+```csharp
+this.calendar = CalendarFactory.CreateFromDateRanges(
+    "CAL",
+    new[]
+    {
+        new DateRange(new DateTime(2020, 1, 1), new DateTime(2020, 1, 1, 23, 59, 59)),
+        new DateRange(new DateTime(2020, 1, 20), new DateTime(2020, 1, 20, 23, 59, 59)),
+        new DateRange(new DateTime(2020, 2, 17), new DateTime(2020, 2, 17, 23, 59, 59)),
+        new DateRange(new DateTime(2020, 4, 10), new DateTime(2020, 4, 10, 23, 59, 59)),
+        new DateRange(new DateTime(2020, 5, 25), new DateTime(2020, 5, 25, 23, 59, 59)),
+        new DateRange(new DateTime(2020, 7, 3), new DateTime(2020, 7, 3, 23, 59, 59)),
+        new DateRange(new DateTime(2020, 9, 7), new DateTime(2020, 9, 7, 23, 59, 59)),
+        new DateRange(new DateTime(2020, 11, 26), new DateTime(2020, 11, 26, 23, 59, 59)),
+        new DateRange(new DateTime(2020, 12, 25), new DateTime(2020, 12, 25, 23, 59, 59)),
+    });
+```
+
 #### CalendarContext
 This class provides a scope in which a `Calendar` is to be used to resolve `RelativeDate` instances.
 It allows optimized use of the `Calendar` instance which often will have some sort of backing store
@@ -60,7 +122,6 @@ for example:
 
 A `CalendarContext` is initialized with any number of `ICalendar`s and will merge the results. 
 This allows separate calendar implementations for public holidays vs. company/office specific.
-
 
 ## Spencen.Common.Calendar.Test
 Unit tests for Spencen.Common.Calendar.
@@ -77,3 +138,19 @@ Tests to cover a variety of public holidays across multiple years.
 
 ## CalendarTest
 Console app to showcase library usage.
+
+```csharp
+[TestMethod]
+public void Get_Australian_Holidays_From_Service()
+{
+    var dateRange = new DateRange(new DateTime(2020, 1, 1), new DateTime(2020, 12, 31));
+    var asOfDate = new DateTime(2020, 4, 10); // Good Friday
+    var service = new CalendarificService();
+    using (var context = new CalendarContext(service, dateRange))
+    {
+        var result = context.GetCurrentOrNextBusinessDay("au", asOfDate);
+
+        Assert.AreEqual(new DateTime(2020, 4, 14), result, "Australia observes Good Monday, so skip to 14th.");
+    }
+}
+```
