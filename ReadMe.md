@@ -126,19 +126,6 @@ This allows separate calendar implementations for public holidays vs. company/of
 ## Spencen.Common.Calendar.Test
 Unit tests for Spencen.Common.Calendar.
 
-#### RelativeDateTests
-Basic `RelativeDate` tests using flux syntax.
-#### CalendarTest
-Business day logic tests that include calendars.
-Also includes performance test for calendar caching and using Calenderifc service to populate an `ICalendar`.
-#### RelativeDateBuilderTests
-Tests to cover `RelativeDateBuilder` generates the correct `RelativeDate` output.
-#### RelativeHolidayTests
-Tests to cover a variety of public holidays across multiple years.
-
-## CalendarTest
-Console app to showcase library usage.
-
 ```csharp
 [TestMethod]
 public void Get_Australian_Holidays_From_Service()
@@ -154,3 +141,16 @@ public void Get_Australian_Holidays_From_Service()
     }
 }
 ```
+
+#### RelativeDateTests
+Basic `RelativeDate` tests using flux syntax.
+#### CalendarTest
+Business day logic tests that include calendars.
+Also includes performance test for calendar caching and using Calenderifc service to populate an `ICalendar`.
+#### RelativeDateBuilderTests
+Tests to cover `RelativeDateBuilder` generates the correct `RelativeDate` output.
+#### RelativeHolidayTests
+Tests to cover a variety of public holidays across multiple years.
+
+## CalendarTest
+Console app to showcase library usage.
