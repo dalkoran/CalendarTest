@@ -83,29 +83,42 @@ public interface IHoliday
 }
 ```
 
+Here we create a calendar directly using `SimpleCalendar` and `SimpleHoliday`, implementations provided by the library.
+
+```csharp
+var testCalendar = new SimpleCalendar(
+    "US2020",
+    new[]
+    {
+        new SimpleHoliday(new DateTime(2020, 01, 01), "New Year's Day"),
+        new SimpleHoliday(new DateTime(2020, 01, 20), "Martin Luther King Jr Day"),
+        new SimpleHoliday(new DateTime(2020, 02, 17), "Presidents Day"),
+        new SimpleHoliday(new DateTime(2020, 04, 10), "Good Friday"),
+        new SimpleHoliday(new DateTime(2020, 05, 25), "Memorial Day"),
+        new SimpleHoliday(new DateTime(2020, 07, 03), "Independence Day"),
+        new SimpleHoliday(new DateTime(2020, 09, 07), "Labor Day"),
+        new SimpleHoliday(new DateTime(2020, 11, 26), "Thanksgiving"),
+        new SimpleHoliday(new DateTime(2020, 12, 25), "Christmas Day"),
+    },
+    CalendarFactory.MondayToFridayWorkWeek);
+```
+
 #### CalendarFactory
 
 The `CalendarFactory` static class provides a helper method, together with two very simple functions for
 creating a default 5 or 7 day work week calendar.
 
-Here we create a calendar using the static function, which defaults to a 5 day (Mon-Fri) business days week
-and includes holidays as provided by the array.
-
 ```csharp
-this.calendar = CalendarFactory.CreateFromDateRanges(
-    "CAL",
-    new[]
-    {
-        new DateRange(new DateTime(2020, 1, 1), new DateTime(2020, 1, 1, 23, 59, 59)),
-        new DateRange(new DateTime(2020, 1, 20), new DateTime(2020, 1, 20, 23, 59, 59)),
-        new DateRange(new DateTime(2020, 2, 17), new DateTime(2020, 2, 17, 23, 59, 59)),
-        new DateRange(new DateTime(2020, 4, 10), new DateTime(2020, 4, 10, 23, 59, 59)),
-        new DateRange(new DateTime(2020, 5, 25), new DateTime(2020, 5, 25, 23, 59, 59)),
-        new DateRange(new DateTime(2020, 7, 3), new DateTime(2020, 7, 3, 23, 59, 59)),
-        new DateRange(new DateTime(2020, 9, 7), new DateTime(2020, 9, 7, 23, 59, 59)),
-        new DateRange(new DateTime(2020, 11, 26), new DateTime(2020, 11, 26, 23, 59, 59)),
-        new DateRange(new DateTime(2020, 12, 25), new DateTime(2020, 12, 25, 23, 59, 59)),
-    });
+/// <summary>
+/// Creates a simple ICalendar implementation from an enumeration of date ranges, where each item
+/// in the enumeration is considered to be a holiday.
+/// </summary>
+/// <param name="key">A key to uniquely identify the calendar.</param>
+/// <param name="dateRanges">An enumeration of date ranges that are considered to be holidays.</param>
+/// <param name="isWorkingDayFunc">A function that determines whether or not a day of the week is a working day (excluding holidays). 
+/// This will default to a standard five day working week from Monday through Friday inclusive.</param>
+/// <returns>An instance that implements the ICalendar interface.</returns>
+public static ICalendar CreateFromDateRanges(string key, IEnumerable<DateRange> dateRanges, Func<DayOfWeek, bool> isWorkingDayFunc = null)
 ```
 
 #### CalendarContext

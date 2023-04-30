@@ -7,6 +7,7 @@ namespace Spencen.Common.Calendar.Test
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
+    using Spencen.Common.Calendar.Calendars;
     using Spencen.Common.Calendar.Services;
 
     [TestClass]
@@ -18,20 +19,21 @@ namespace Spencen.Common.Calendar.Test
         [TestInitialize]
         public void Initialize()
         {
-            this.calendar = CalendarFactory.CreateFromDateRanges(
-                "CAL",
+            this.calendar = new SimpleCalendar(
+                "US2020",
                 new[]
                 {
-                    new DateRange(new DateTime(2020, 1, 1), new DateTime(2020, 1, 1, 23, 59, 59)),
-                    new DateRange(new DateTime(2020, 1, 20), new DateTime(2020, 1, 20, 23, 59, 59)),
-                    new DateRange(new DateTime(2020, 2, 17), new DateTime(2020, 2, 17, 23, 59, 59)),
-                    new DateRange(new DateTime(2020, 4, 10), new DateTime(2020, 4, 10, 23, 59, 59)),
-                    new DateRange(new DateTime(2020, 5, 25), new DateTime(2020, 5, 25, 23, 59, 59)),
-                    new DateRange(new DateTime(2020, 7, 3), new DateTime(2020, 7, 3, 23, 59, 59)),
-                    new DateRange(new DateTime(2020, 9, 7), new DateTime(2020, 9, 7, 23, 59, 59)),
-                    new DateRange(new DateTime(2020, 11, 26), new DateTime(2020, 11, 26, 23, 59, 59)),
-                    new DateRange(new DateTime(2020, 12, 25), new DateTime(2020, 12, 25, 23, 59, 59)),
-                });
+                    new SimpleHoliday(new DateTime(2020, 01, 01), "New Year's Day"),
+                    new SimpleHoliday(new DateTime(2020, 01, 20), "Martin Luther King Jr Day"),
+                    new SimpleHoliday(new DateTime(2020, 02, 17), "Presidents Day"),
+                    new SimpleHoliday(new DateTime(2020, 04, 10), "Good Friday"),
+                    new SimpleHoliday(new DateTime(2020, 05, 25), "Memorial Day"),
+                    new SimpleHoliday(new DateTime(2020, 07, 03), "Independence Day"),
+                    new SimpleHoliday(new DateTime(2020, 09, 07), "Labor Day"),
+                    new SimpleHoliday(new DateTime(2020, 11, 26), "Thanksgiving"),
+                    new SimpleHoliday(new DateTime(2020, 12, 25), "Christmas Day"),
+                },
+                CalendarFactory.MondayToFridayWorkWeek);
 
             this.personalCalendar = CalendarFactory.CreateFromDateRanges(
                 "Personal",
