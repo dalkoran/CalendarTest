@@ -13,13 +13,7 @@ namespace Spencen.Common.Calendar.Test
     [TestClass]
     public class CalendarTests
     {
-        private ICalendar calendar;
-        private ICalendar personalCalendar;
-
-        [TestInitialize]
-        public void Initialize()
-        {
-            this.calendar = new SimpleCalendar(
+        public static ICalendar staticSimpleCalendar = new SimpleCalendar(
                 "US2020",
                 new[]
                 {
@@ -35,13 +29,22 @@ namespace Spencen.Common.Calendar.Test
                 },
                 CalendarFactory.MondayToFridayWorkWeek);
 
-            this.personalCalendar = CalendarFactory.CreateFromDateRanges(
+        public static ICalendar staticPersonalCalendar = CalendarFactory.CreateFromDateRanges(
                 "Personal",
                 new[]
                 {
                     new DateRange(new DateTime(2020, 4, 6), new DateTime(2020, 4, 9, 23, 59, 59)),
                     new DateRange(new DateTime(2020, 8, 10), new DateTime(2020, 8, 21, 23, 59, 59)),
                 });
+
+        private ICalendar calendar = staticSimpleCalendar;
+        private ICalendar personalCalendar = staticPersonalCalendar;
+
+        [TestInitialize]
+        public void Initialize()
+        {
+            this.calendar = staticSimpleCalendar;
+            this.personalCalendar = staticPersonalCalendar;
         }
 
         [TestMethod]
@@ -498,6 +501,15 @@ namespace Spencen.Common.Calendar.Test
                 var result = context.AddBusinessDays("KEY", new DateTime(2020, 6, 4), 2);
                 Assert.AreEqual(new DateTime(2020, 6, 8), result);
             }
+        }
+
+        [TestMethod]
+        public void InfiniteRange()
+        {
+            Assert.IsTrue(new DateRange().IsInfinite);
+            Assert.IsTrue(new DateRange(null, null).IsInfinite);
+            Assert.IsTrue(new DateRange(DateTime.Today, null).IsInfinite);
+            Assert.IsTrue(new DateRange(null, DateTime.Today).IsInfinite);
         }
 
         #region Negative testing

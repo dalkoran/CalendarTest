@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
     using System.Text;
+    using System.Diagnostics.CodeAnalysis;
 
     public struct DateRange
     {
@@ -16,6 +17,9 @@
         public DateTime? BeginDate { get; set; }
         public DateTime? EndDate { get; set; }
 
+#if NET8_0
+        [MemberNotNullWhen(false, nameof(BeginDate), nameof(EndDate))]
+#endif
         public bool IsInfinite { get => !this.BeginDate.HasValue || !this.EndDate.HasValue; }
 
         public bool Contains(DateTime date)
