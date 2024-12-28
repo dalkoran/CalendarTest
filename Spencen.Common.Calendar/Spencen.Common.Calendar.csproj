@@ -6,8 +6,9 @@
     <Company>Nigel Spencer</Company>
     <Product />
     <Description>Classes to perform date artithmetic, for example 5th business day in next June. Also contains RelativeDate class that allows dates to be described relative a seed date, e.g. 4th Thursday in Nov of this year.</Description>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <TargetFrameworks>netstandard2.1;net8.0</TargetFrameworks>
+    <PackageReleaseNotes>1.2 Adds nullable support specifically for .NET 8+</PackageReleaseNotes>
     <PackageReadmeFile>ReadMe.md</PackageReadmeFile>
   </PropertyGroup>
 
