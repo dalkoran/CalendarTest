@@ -6,19 +6,26 @@
     <Company>Nigel Spencer</Company>
     <Product />
     <Description>Classes to perform date artithmetic, for example 5th business day in next June. Also contains RelativeDate class that allows dates to be described relative a seed date, e.g. 4th Thursday in Nov of this year.</Description>
-    <Version>1.2.0</Version>
+    <Version>1.3.4</Version>
     <TargetFrameworks>netstandard2.1;net8.0</TargetFrameworks>
-    <PackageReleaseNotes>1.2 Adds nullable support specifically for .NET 8+</PackageReleaseNotes>
+    <PackageReleaseNotes>1.3 Adds RelativeHoliday class and static helpers
+1.2 Adds nullable support specifically for .NET 8+</PackageReleaseNotes>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageProjectUrl>https://github.com/dalkoran/CalendarTest</PackageProjectUrl>
     <PackageReadmeFile>ReadMe.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/dalkoran/CalendarTest</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\ReadMe.md" Pack="true" PackagePath="\" />
+    <None Include="..\ReadMe.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.0" />
-    <PackageReference Include="System.Text.Json" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
+    <PackageReference Include="System.Text.Json" Version="8.0.6" />
   </ItemGroup>
 
 </Project>
