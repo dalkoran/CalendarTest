@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.5.33424.131
+# Visual Studio Version 18
+VisualStudioVersion = 18.4.11513.90 insiders
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CalendarTest", "CalendarTest\CalendarTest.csproj", "{5A7E085F-FC16-404D-BAFA-F2EECC652FD3}"
 EndProject
@@ -12,6 +12,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{0E708612-6313-426B-8DCE-310E035B5583}"
 	ProjectSection(SolutionItems) = preProject
 		ReadMe.md = ReadMe.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2FC33B92-B107-4610-91E8-5AB83D603EF3}"
+	ProjectSection(SolutionItems) = preProject
+		Nuget.config = Nuget.config
 	EndProjectSection
 EndProject
 Global

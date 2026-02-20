@@ -514,31 +514,37 @@ namespace Spencen.Common.Calendar.Test
 
         #region Negative testing
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow(0)]
         [DataRow(-3)]
         [DataRow(8)]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void Get_Business_Day_Of_Week_Expects_Offset_Greater_Than_Zero(int input)
         {
-            this.calendar.GetFirstBusinessDaysOfWeek(new DateRange(new DateTime(2020, 1,1 ), new DateTime(2020, 12, 31)), input).Count();
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() =>
+            {
+                this.calendar.GetFirstBusinessDaysOfWeek(new DateRange(new DateTime(2020, 1, 1), new DateTime(2020, 12, 31)), input).Count();
+            });
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void Get_Business_Day_of_Week_Invalid_Date_Range()
         {
-            this.calendar.GetFirstBusinessDaysOfWeek(new DateRange(null, new DateTime(2020, 12, 31)), 1).Count();
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() =>
+            {
+                this.calendar.GetFirstBusinessDaysOfWeek(new DateRange(null, new DateTime(2020, 12, 31)), 1).Count();
+            });
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void Invalid_Calendar()
         {
-            using (var calendarContext = new CalendarContext(this.calendar, this.personalCalendar))
+            Assert.Throws<ArgumentException>(() =>
             {
-                calendarContext.AddBusinessDays("WRONG", DateTime.Today, 1);
-            }
+                using (var calendarContext = new CalendarContext(this.calendar, this.personalCalendar))
+                {
+                    calendarContext.AddBusinessDays("WRONG", DateTime.Today, 1);
+                }
+            });
         }
 
         #endregion

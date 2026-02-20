@@ -8,7 +8,7 @@
     [TestClass]
     public class RelativeHolidayTests
     {
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("2000-01-03", 2000)]
         [DataRow("2013-01-01", 2013)]
         [DataRow("2014-01-01", 2014)]
@@ -26,7 +26,7 @@
             Assert.AreEqual(expected, result, $"New Years Day holiday {year}");
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("2016-07-04", 2016)]
         [DataRow("2017-07-04", 2017)]
         [DataRow("2018-07-04", 2018)]
@@ -42,7 +42,7 @@
             Assert.AreEqual(expected, result, $"Fourth of July (Observed) {year}");
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("2016-11-24", 2016)]
         [DataRow("2017-11-23", 2017)]
         [DataRow("2018-11-22", 2018)]
