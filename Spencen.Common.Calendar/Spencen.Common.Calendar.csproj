@@ -8,7 +8,12 @@
     <Product />
     <Description>Classes to perform date artithmetic, for example 5th business day in next June. Also contains RelativeDate class that allows dates to be described relative a seed date, e.g. 4th Thursday in Nov of this year.</Description>
     <Version>1.1.0</Version>
+    <PackageReadmeFile>ReadMe.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\ReadMe.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.4" />
